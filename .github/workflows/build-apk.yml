@@ -83,9 +83,6 @@ jobs:
               <allow-intent href="https://*/*" />
               <platform name="android">
                   <allow-intent href="market:*" />
-                  <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-                      <application android:usesCleartextTraffic="true" />
-                  </edit-config>
                   <preference name="AndroidXEnabled" value="true" />
               </platform>
               <preference name="Orientation" value="portrait" />
@@ -96,8 +93,6 @@ jobs:
 
       - name: Add Android platform
         working-directory: cordova-app
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
         run: cordova platform add android
 
       - name: Build debug APK
