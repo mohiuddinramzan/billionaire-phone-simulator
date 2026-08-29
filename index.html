@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#07070b" />
+<title>Billionaire Phone Simulator</title>
+<meta name="description" content="A fictional entertainment simulator — spend a virtual $100,000,000,000 on hypercars, islands, jets and more. No real money involved." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app-root">
+  <!-- ============ PHONE FRAME ============ -->
+  <div class="phone-shell">
+    <div class="phone" id="phone">
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <span id="clock-time" class="status-time">9:41</span>
+        <div class="status-icons">
+          <span id="signal-icon" title="Signal">▂▄▆█</span>
+          <span id="wifi-icon" title="Wi-Fi">📶</span>
+          <span id="battery-pct" class="battery">100%</span>
+          <span class="battery-shell"><span class="battery-fill" id="battery-fill"></span></span>
+        </div>
+      </div>
+
+      <!-- ================= HOME SCREEN ================= -->
+      <div class="screen home-screen" id="home-screen">
+
+        <div class="home-header">
+          <div class="home-date" id="home-date">Saturday, August 29</div>
+          <div class="home-clock" id="home-clock">9:41</div>
+        </div>
+
+        <button class="balance-widget" id="balance-widget" aria-label="Open Private Bank">
+          <div class="balance-label">TOTAL NET WORTH</div>
+          <div class="balance-amount" id="home-balance">$100,000,000,000</div>
+          <div class="balance-sub" id="home-balance-sub">Billionaire Bank · fictional funds</div>
+        </button>
+
+        <div class="app-grid" id="app-grid"><!-- injected by JS --></div>
+
+        <div class="dock" id="dock"><!-- injected by JS --></div>
+      </div>
+
+      <!-- ================= APP OVERLAYS (single mount point) ================= -->
+      <div class="screen app-screen" id="app-screen">
+        <div class="app-topbar">
+          <button class="back-btn" id="app-back">‹ <span id="app-back-label">Home</span></button>
+          <div class="app-title" id="app-title">App</div>
+          <div class="app-topbar-spacer"></div>
+        </div>
+        <div class="app-body" id="app-body"><!-- injected by JS per-app --></div>
+      </div>
+
+      <!-- BROKE MODE OVERLAY -->
+      <div class="screen broke-screen hidden" id="broke-screen">
+        <div class="broke-inner">
+          <div class="broke-skull">💀</div>
+          <div class="broke-title">YOU ARE BROKE</div>
+          <div class="broke-stats" id="broke-stats"></div>
+          <p class="broke-quip" id="broke-quip"></p>
+          <div class="broke-actions">
+            <button class="primary-btn" id="broke-restart">🔄 Start Again</button>
+            <button class="ghost-btn" id="broke-share">📤 Share Result</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOME INDICATOR / NAV -->
+      <div class="home-indicator" id="home-indicator-btn" aria-label="Home"></div>
+
+      <!-- TOAST / NOTIFICATION LAYER -->
+      <div class="toast-layer" id="toast-layer"></div>
+
+      <!-- CONFETTI LAYER -->
+      <canvas class="confetti-layer" id="confetti-layer"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

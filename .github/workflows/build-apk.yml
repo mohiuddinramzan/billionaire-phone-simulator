@@ -1,0 +1,120 @@
+name: Build Android APK
+
+# Builds a debug APK of Billionaire Phone Simulator using Apache Cordova
+# (a free, open-source WebView wrapper) and uploads it as a downloadable
+# GitHub Actions artifact. No paid services or API keys are required.
+#
+# How to use:
+#   1. Push this repository to GitHub.
+#   2. Go to the "Actions" tab.
+#   3. Select "Build Android APK" in the sidebar.
+#   4. Click "Run workflow".
+#   5. When it finishes, open the run and download the
+#      "billionaire-phone-simulator-debug-apk" artifact.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "index.html"
+      - "style.css"
+      - "script.js"
+      - "assets/**"
+      - ".github/workflows/build-apk.yml"
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Java (Temurin 17)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install required Android SDK packages
+        run: |
+          sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+
+      - name: Install Apache Cordova
+        run: npm install -g cordova
+
+      - name: Disable Cordova telemetry
+        run: cordova telemetry off || true
+
+      - name: Create Cordova project shell
+        run: |
+          cordova create cordova-app com.billionaire.phonesimulator "Billionaire Phone Simulator"
+
+      - name: Copy web app into Cordova www folder
+        run: |
+          rm -rf cordova-app/www
+          mkdir -p cordova-app/www
+          cp index.html cordova-app/www/
+          cp style.css cordova-app/www/
+          cp script.js cordova-app/www/
+          if [ -d assets ]; then cp -r assets cordova-app/www/assets; fi
+
+      - name: Write Cordova config.xml
+        working-directory: cordova-app
+        run: |
+          cat > config.xml << 'EOF'
+          <?xml version='1.0' encoding='utf-8'?>
+          <widget id="com.billionaire.phonesimulator" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+              <name>Billionaire Phone Simulator</name>
+              <description>A fictional entertainment simulator. Spend a virtual $100,000,000,000 on hypercars, islands, jets and more. No real money is involved.</description>
+              <author email="dev@example.com" href="https://example.com">Billionaire Phone Simulator</author>
+              <content src="index.html" />
+              <access origin="*" />
+              <allow-intent href="http://*/*" />
+              <allow-intent href="https://*/*" />
+              <platform name="android">
+                  <allow-intent href="market:*" />
+                  <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+                      <application android:usesCleartextTraffic="true" />
+                  </edit-config>
+                  <preference name="AndroidXEnabled" value="true" />
+              </platform>
+              <preference name="Orientation" value="portrait" />
+              <preference name="Fullscreen" value="false" />
+              <preference name="BackgroundColor" value="0xff07070b" />
+          </widget>
+          EOF
+
+      - name: Add Android platform
+        working-directory: cordova-app
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+        run: cordova platform add android
+
+      - name: Build debug APK
+        working-directory: cordova-app
+        run: cordova build android --debug
+
+      - name: Locate APK
+        id: locate
+        working-directory: cordova-app
+        run: |
+          APK_PATH=$(find platforms/android -name "*-debug.apk" | head -n 1)
+          echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
+          echo "Found APK at: $APK_PATH"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: billionaire-phone-simulator-debug-apk
+          path: cordova-app/${{ steps.locate.outputs.apk_path }}
+          if-no-files-found: error
