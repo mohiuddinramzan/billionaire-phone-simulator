@@ -1005,4 +1005,17 @@ function boot(){
   document.body.addEventListener("click", () => ensureAudio(), { once:true });
 }
 
+
+/* ============================== ANDROID HARDWARE BACK BUTTON (Cordova) ============================== */
+document.addEventListener("deviceready", function(){
+  document.addEventListener("backbutton", onHardwareBack, false);
+}, false);
+
+function onHardwareBack(e){
+  if(e && e.preventDefault) e.preventDefault();
+  if(currentAppId === "messages" && currentThreadId){ handleBack(); return; }
+  if(currentAppId){ closeApp(false); return; }
+  if(window.navigator && navigator.app && navigator.app.exitApp){ navigator.app.exitApp(); }
+}
+
 document.addEventListener("DOMContentLoaded", boot);
